@@ -128,7 +128,9 @@ class XZ::Stream
           @lzma_stream.next_out  = @output_buffer_p
           @lzma_stream.avail_out = XZ::CHUNK_SIZE
           res = XZ::LibLZMA.lzma_code(@lzma_stream.to_ptr, action)
-          XZ.send :check_lzma_code_retval, res # call package-private method
+          unless res == XZ::LibLZMA::LZMA_BUF_ERROR
+            XZ.send :check_lzma_code_retval, res # call package-private method
+          end
 
           data = @output_buffer_p[0, XZ::CHUNK_SIZE - @lzma_stream.avail_out]
           yield(data)
